@@ -1,7 +1,7 @@
 {
     "name": "WalkieUse",
-    "description": "Press T to use a walkie talkie in your inventory no matter what you're holding",
+    "description": "Press R to use a walkie talkie in your inventory no matter what you're holding",
     "version_number": "1.0.0",
     "dependencies": [],
-    "website_url": "https://github.com/redassser/Lc-Flashlight"
+    "website_url": "https://github.com/redassser/Walkie"
 }

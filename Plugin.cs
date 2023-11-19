@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 
 namespace Walkie
 {
-    [BepInPlugin("rr.Walkie", "WalkieUse", "1.0.0")]
+    [BepInPlugin("rr.Walkie", "WalkieUse", "1.0.1")]
     [HarmonyPatch(typeof(PlayerControllerB))]
     public class WalkieToggle : BaseUnityPlugin
     {
@@ -31,7 +31,7 @@ namespace Walkie
                 }
             }
             if (pocketWalkie == null) return;
-            if (Keyboard.current.tKey.wasPressedThisFrame)
+            if (Keyboard.current.rKey.wasPressedThisFrame)
             {
                 if (__instance.currentlyHeldObjectServer is WalkieTalkie)
                 {
@@ -41,7 +41,7 @@ namespace Walkie
                     pocketWalkie.UseItemOnClient(true);
                 }
             }
-            if (Keyboard.current.tKey.wasReleasedThisFrame)
+            if (Keyboard.current.rKey.wasReleasedThisFrame)
             {
                 if (__instance.currentlyHeldObjectServer is WalkieTalkie)
                 {
