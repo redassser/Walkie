@@ -36,23 +36,29 @@ namespace Walkie
             if (pocketWalkie == null) return;
             if (Keyboard.current.rKey.wasPressedThisFrame)
             {
-                if (__instance.currentlyHeldObjectServer is WalkieTalkie)
+                try
                 {
-                    __instance.currentlyHeldObjectServer.UseItemOnClient(true);
-                } else if (pocketWalkie != null)
-                {
-                    pocketWalkie.UseItemOnClient(true);
-                }
+                    if (__instance.currentlyHeldObjectServer is WalkieTalkie)
+                    {
+                        __instance.currentlyHeldObjectServer.UseItemOnClient(true);
+                    } else if (pocketWalkie != null)
+                    {
+                        pocketWalkie.UseItemOnClient(true);
+                    }
+                } catch { }
             }
             if (Keyboard.current.rKey.wasReleasedThisFrame)
             {
-                if (__instance.currentlyHeldObjectServer is WalkieTalkie)
+                try
                 {
-                    __instance.currentlyHeldObjectServer.UseItemOnClient(false);
-                } else if (pocketWalkie != null)
-                {
-                    pocketWalkie.UseItemOnClient(false);
-                }
+                    if (__instance.currentlyHeldObjectServer is WalkieTalkie)
+                    {
+                        __instance.currentlyHeldObjectServer.UseItemOnClient(false);
+                    } else if (pocketWalkie != null)
+                    {
+                        pocketWalkie.UseItemOnClient(false);
+                    }
+                } catch { }
             }
         }
     }
