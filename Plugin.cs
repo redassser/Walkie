@@ -2,6 +2,7 @@
 using HarmonyLib;
 using GameNetcodeStuff;
 using UnityEngine.InputSystem;
+using UnityEngine;
 
 namespace Walkie
 {
@@ -22,6 +23,8 @@ namespace Walkie
             GrabbableObject pocketWalkie = null;
             if ((!__instance.IsOwner || !__instance.isPlayerControlled || __instance.IsServer && !__instance.isHostPlayerObject) && !__instance.isTestingPlayer)
                 return;
+            if (__instance.inTerminalMenu) return;
+            if (!Application.isFocused) return;
             for (int index = 0; index < __instance.ItemSlots.Length; ++index)
             {
                 if (__instance.ItemSlots[index] is WalkieTalkie && __instance.ItemSlots[index].isBeingUsed)
