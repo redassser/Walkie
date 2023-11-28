@@ -5,6 +5,6 @@
 
 Works if you are holding another item or the walkie talkie itself.
 
-All players must have the mod installed. (maybe havent tested. server owner for sure though)
+FULLY CLIENT SIDE!
 
 Walkie talkie must be turned on first.

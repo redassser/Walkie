@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Walkie
 {
-    [BepInPlugin("rr.Walkie", "WalkieUse", "1.0.1")]
+    [BepInPlugin("rr.Walkie", "WalkieUse", "1.2.3")]
     [HarmonyPatch(typeof(PlayerControllerB))]
     public class WalkieToggle : BaseUnityPlugin
     {
@@ -23,7 +23,8 @@ namespace Walkie
             GrabbableObject pocketWalkie = null;
             if ((!__instance.IsOwner || !__instance.isPlayerControlled || __instance.IsServer && !__instance.isHostPlayerObject) && !__instance.isTestingPlayer)
                 return;
-            if (__instance.inTerminalMenu) return;
+            if (__instance.inTerminalMenu || __instance.isTypingChat) return;
+            if (ShipBuildModeManager.Instance.InBuildMode) return;
             if (!Application.isFocused) return;
             for (int index = 0; index < __instance.ItemSlots.Length; ++index)
             {
