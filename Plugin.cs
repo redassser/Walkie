@@ -32,10 +32,10 @@ namespace Walkie
                         {
                             ""name"" : ""Walkie"",
                             ""actions"": [
-                                {""name"": ""toggle"", ""type"" : ""button""}
+                                {""name"": ""togglew"", ""type"" : ""button""}
                             ],
                             ""bindings"" : [
-                                {""path"" : """ + thing + @""", ""action"": ""toggle""}
+                                {""path"" : """ + thing + @""", ""action"": ""togglew""}
                             ]
                         }
                     ]
@@ -45,6 +45,7 @@ namespace Walkie
         [HarmonyPrefix]
         public static void SavingToFile(IngamePlayerSettings __instance)
         {
+            if (__instance.rebindingOperation.action.name != "togglew") return;
             File.WriteAllText(path, __instance.rebindingOperation.action.controls[0].path);
             string thing = defaultkey;
             if (File.Exists(path))
@@ -73,7 +74,7 @@ namespace Walkie
             }
             RemappableKey fl = new RemappableKey();
             setAsset(thing);
-            InputActionReference inp = InputActionReference.Create(asset.FindAction("Walkie/toggle"));
+            InputActionReference inp = InputActionReference.Create(asset.FindAction("Walkie/togglew"));
             fl.ControlName = "Walkie";
             fl.currentInput = inp;
 
@@ -107,7 +108,7 @@ namespace Walkie
                 thing = File.ReadAllText(path);
             }
             if (!asset || !asset.enabled) { setAsset(thing); asset.Enable(); }
-            if (asset.FindAction("Walkie/toggle").WasPressedThisFrame())
+            if (asset.FindAction("Walkie/togglew").WasPressedThisFrame())
             {
                 try
                 {
@@ -120,7 +121,7 @@ namespace Walkie
                     }
                 } catch { }
             }
-            if (asset.FindAction("Walkie/toggle").WasReleasedThisFrame())
+            if (asset.FindAction("Walkie/togglew").WasReleasedThisFrame())
             {
                 try
                 {
