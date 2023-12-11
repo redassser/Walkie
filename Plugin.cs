@@ -3,18 +3,81 @@ using HarmonyLib;
 using GameNetcodeStuff;
 using UnityEngine.InputSystem;
 using UnityEngine;
+using System.IO;
+using BepInEx.Logging;
 
 namespace Walkie
 {
-    [BepInPlugin("rr.Walkie", "WalkieUse", "1.2.3")]
+    [BepInPlugin("rr.Walkie", "WalkieUse", "1.3.0")]
     [HarmonyPatch(typeof(PlayerControllerB))]
     public class WalkieToggle : BaseUnityPlugin
     {
-        private Harmony _harmony = new Harmony("Flashlight");
+        static string path = Application.persistentDataPath + "/walkiebutton.txt";
+        internal static ManualLogSource logSource;
+        static InputActionAsset asset;
+        static string defaultkey = "/Keyboard/r";
+
+        private Harmony _harmony = new Harmony("Walkie");
         private void Awake()
         {
             this._harmony.PatchAll(typeof(WalkieToggle));
             this.Logger.LogInfo("------Walkie done.------");
+            WalkieToggle.logSource = base.Logger;
+        }
+        public static void setAsset(string thing)
+        {
+            asset = InputActionAsset.FromJson(@"
+                {
+                    ""maps"" : [
+                        {
+                            ""name"" : ""Walkie"",
+                            ""actions"": [
+                                {""name"": ""toggle"", ""type"" : ""button""}
+                            ],
+                            ""bindings"" : [
+                                {""path"" : """ + thing + @""", ""action"": ""toggle""}
+                            ]
+                        }
+                    ]
+                }");
+        }
+        [HarmonyPatch(typeof(IngamePlayerSettings), "CompleteRebind")]
+        [HarmonyPrefix]
+        public static void SavingToFile(IngamePlayerSettings __instance)
+        {
+            File.WriteAllText(path, __instance.rebindingOperation.action.controls[0].path);
+            string thing = defaultkey;
+            if (File.Exists(path))
+            {
+                thing = File.ReadAllText(path);
+            }
+            setAsset(thing);
+        }
+
+        [HarmonyPatch(typeof(KepRemapPanel), "LoadKeybindsUI")]
+        [HarmonyPrefix]
+        public static void Testing(KepRemapPanel __instance)
+        {
+            string thing = defaultkey;
+            if (!File.Exists(path))
+            {
+                File.WriteAllText(path, defaultkey);
+            } else
+            {
+                thing = File.ReadAllText(path);
+            }
+
+            for (int index1 = 0; index1 < __instance.remappableKeys.Count; ++index1)
+            {
+                if (__instance.remappableKeys[index1].ControlName == "Walkie") return;
+            }
+            RemappableKey fl = new RemappableKey();
+            setAsset(thing);
+            InputActionReference inp = InputActionReference.Create(asset.FindAction("Walkie/toggle"));
+            fl.ControlName = "Walkie";
+            fl.currentInput = inp;
+
+            __instance.remappableKeys.Add(fl);
         }
         [HarmonyPatch(typeof(PlayerControllerB), "Update")]
         [HarmonyPostfix]
@@ -35,7 +98,16 @@ namespace Walkie
                 }
             }
             if (pocketWalkie == null) return;
-            if (Keyboard.current.rKey.wasPressedThisFrame)
+            string thing = defaultkey;
+            if (!File.Exists(path))
+            {
+                File.WriteAllText(path, defaultkey);
+            } else
+            {
+                thing = File.ReadAllText(path);
+            }
+            if (!asset || !asset.enabled) { setAsset(thing); asset.Enable(); }
+            if (asset.FindAction("Walkie/toggle").WasPressedThisFrame())
             {
                 try
                 {
@@ -48,7 +120,7 @@ namespace Walkie
                     }
                 } catch { }
             }
-            if (Keyboard.current.rKey.wasReleasedThisFrame)
+            if (asset.FindAction("Walkie/toggle").WasReleasedThisFrame())
             {
                 try
                 {
