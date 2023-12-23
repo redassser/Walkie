@@ -11,4 +11,6 @@ FULLY CLIENT SIDE!
 
 Walkie talkie must be turned on first.
 
-Rebind from the ingame rebind settings menu, should be at the bottom of the list
+Rebind from the ingame rebind settings menu, now using Input Utils!
+
+If you still want to use this mod without Input Utils, then v1.3.1 still works.

@@ -5,17 +5,22 @@ using UnityEngine.InputSystem;
 using UnityEngine;
 using System.IO;
 using BepInEx.Logging;
+using LethalCompanyInputUtils.Api;
 
 namespace Walkie
 {
-    [BepInPlugin("rr.Walkie", "WalkieUse", "1.3.0")]
+    public class WalkieButton : LcInputActions
+    {
+        [InputAction("<Keyboard>/r", Name = "Walkie")]
+        public InputAction WalkieKey { get; set; }
+    }
+    [BepInPlugin("rr.Walkie", "WalkieUse", "1.4.0")]
     [HarmonyPatch(typeof(PlayerControllerB))]
     public class WalkieToggle : BaseUnityPlugin
     {
         static string path = Application.persistentDataPath + "/walkiebutton.txt";
         internal static ManualLogSource logSource;
-        static InputActionAsset asset;
-        static string defaultkey = "/Keyboard/r";
+        internal static WalkieButton InputActionInstance = new WalkieButton();
 
         private Harmony _harmony = new Harmony("Walkie");
         private void Awake()
@@ -23,62 +28,6 @@ namespace Walkie
             this._harmony.PatchAll(typeof(WalkieToggle));
             this.Logger.LogInfo("------Walkie done.------");
             WalkieToggle.logSource = base.Logger;
-        }
-        public static void setAsset(string thing)
-        {
-            asset = InputActionAsset.FromJson(@"
-                {
-                    ""maps"" : [
-                        {
-                            ""name"" : ""Walkie"",
-                            ""actions"": [
-                                {""name"": ""togglew"", ""type"" : ""button""}
-                            ],
-                            ""bindings"" : [
-                                {""path"" : """ + thing + @""", ""action"": ""togglew""}
-                            ]
-                        }
-                    ]
-                }");
-        }
-        [HarmonyPatch(typeof(IngamePlayerSettings), "CompleteRebind")]
-        [HarmonyPrefix]
-        public static void SavingToFile(IngamePlayerSettings __instance)
-        {
-            if (__instance.rebindingOperation.action.name != "togglew") return;
-            File.WriteAllText(path, __instance.rebindingOperation.action.controls[0].path);
-            string thing = defaultkey;
-            if (File.Exists(path))
-            {
-                thing = File.ReadAllText(path);
-            }
-            setAsset(thing);
-        }
-
-        [HarmonyPatch(typeof(KepRemapPanel), "LoadKeybindsUI")]
-        [HarmonyPrefix]
-        public static void Testing(KepRemapPanel __instance)
-        {
-            string thing = defaultkey;
-            if (!File.Exists(path))
-            {
-                File.WriteAllText(path, defaultkey);
-            } else
-            {
-                thing = File.ReadAllText(path);
-            }
-
-            for (int index1 = 0; index1 < __instance.remappableKeys.Count; ++index1)
-            {
-                if (__instance.remappableKeys[index1].ControlName == "Walkie") return;
-            }
-            RemappableKey fl = new RemappableKey();
-            setAsset(thing);
-            InputActionReference inp = InputActionReference.Create(asset.FindAction("Walkie/togglew"));
-            fl.ControlName = "Walkie";
-            fl.currentInput = inp;
-
-            __instance.remappableKeys.Add(fl);
         }
         [HarmonyPatch(typeof(PlayerControllerB), "Update")]
         [HarmonyPostfix]
@@ -99,16 +48,7 @@ namespace Walkie
                 }
             }
             if (pocketWalkie == null) return;
-            string thing = defaultkey;
-            if (!File.Exists(path))
-            {
-                File.WriteAllText(path, defaultkey);
-            } else
-            {
-                thing = File.ReadAllText(path);
-            }
-            if (!asset || !asset.enabled) { setAsset(thing); asset.Enable(); }
-            if (asset.FindAction("Walkie/togglew").WasPressedThisFrame())
+            if (WalkieToggle.InputActionInstance.WalkieKey.WasPressedThisFrame())
             {
                 try
                 {
@@ -121,7 +61,7 @@ namespace Walkie
                     }
                 } catch { }
             }
-            if (asset.FindAction("Walkie/togglew").WasReleasedThisFrame())
+            if (WalkieToggle.InputActionInstance.WalkieKey.WasReleasedThisFrame())
             {
                 try
                 {
