@@ -1,3 +1,7 @@
+## v1.5.0
+
+Fixed compatibility with DesktopTerminal (Can use walkie key while on terminal) and AdvancedCompany (Walkie key does not interact with headset)
+
 ## v1.4.0
 
 Input Utils added as a dependency to simplify and make it better.
